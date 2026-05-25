@@ -223,14 +223,16 @@ Before running anything, take a moment to review what `src/tests/run_monitoring.
 
 Now you'll examine the aggregated performance metrics for all three versions.
 
-### Navigate to Azure Monitor from Microsoft Foundry
+### Navigate to usage data in Microsoft Foundry
 
 1. In a web browser, open the [Microsoft Foundry portal](https://ai.azure.com) at `https://ai.azure.com` and sign in using your Azure credentials.
 1. Open your Foundry project.
-1. In the navigation pane on the left, select **Monitoring**.
-1. Select **Resource usage** to see a summary of model interactions.
+1. In the navigation pane on the left, select **Operate** > **Overview**.
+1. Locate the usage cards that summarize model interactions.
 
-    > **Note**: If no data appears yet, wait a minute and refresh the page.
+    > **Important**: The older **Monitoring > Resource usage** page has been removed in the current Foundry UI. Usage details are now shown as summary cards under **Operate > Overview**.
+
+    > **Note**: If the cards show `No data to show`, wait 2-5 minutes after running `python src/tests/run_monitoring.py`, then refresh. If data is still missing, use `python src/tests/check_traces.py` as your primary verification source for this lab.
 
 ### Review token usage across versions
 
@@ -302,11 +304,14 @@ The `check_traces.py` output gives you the full span tree for each version run â
 
 ## (OPTIONAL) Create an alert
 
-If you have extra time, set up an alert to notify you when token usage exceeds a threshold. This is an exercise designed to challenge you, which means instructions are intentionally less detailed.
+If you have extra time, set up an alert to notify you when token usage exceeds a threshold. In the current experience, alert creation is done in the Azure portal (not inside the Foundry portal UI).
 
-- In Azure Monitor, create a **new alert rule** for your Microsoft Foundry project.
-- Choose a metric such as **Total token count** and define a threshold that would be exceeded if you ran the script again (based on what you observed above).
-- Create a **new action group** to define how you'll be notified.
+1. Open the [Azure portal](https://portal.azure.com) and go to your **Application Insights** resource (the one deployed with this lab).
+1. In the left menu, select **Alerts** > **Create** > **Alert rule**.
+1. Select a signal related to requests, failures, or performance and define a threshold that would be exceeded if you ran the script again (based on what you observed above).
+1. Create a new **Action group** to define how you'll be notified.
+
+> **Important**: The Foundry portal no longer exposes a **New alert rule** button for this workflow. Use Azure Monitor in `portal.azure.com` for alert configuration.
 
 Alerts help you proactively catch unexpected spikes in usage before they translate into budget overruns.
 
