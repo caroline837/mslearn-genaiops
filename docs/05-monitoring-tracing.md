@@ -331,14 +331,45 @@ The `check_traces.py` output gives you the full span tree for each version run â
 
 ## (OPTIONAL) Create an alert
 
-If you have extra time, set up an alert to notify you when token usage exceeds a threshold. In the current experience, alert creation is done in the Azure portal (not inside the Foundry portal UI).
+If you have extra time, set up an alert to notify you when token usage exceeds a threshold. Use Azure CLI to create the alert, which avoids potential UI binding issues in the Azure portal.
 
-1. Open the [Azure portal](https://portal.azure.com) and go to your **Application Insights** resource (the one deployed with this lab).
-1. In the left menu, select **Alerts** > **Create** > **Alert rule**.
-1. Select a signal related to requests, failures, or performance and define a threshold that would be exceeded if you ran the script again (based on what you observed above).
-1. Create a new **Action group** to define how you'll be notified.
+1. In the VS Code terminal, create a new action group to receive notifications:
 
-> **Important**: The Foundry portal no longer exposes a **New alert rule** button for this workflow. Use Azure Monitor in `portal.azure.com` for alert configuration.
+    ```powershell
+    az monitor action-group create `
+      --resource-group <resource-group> `
+      --name <action-group-name> `
+      --short-name <short-name>
+    ```
+
+    Add an email action to the group:
+
+    ```powershell
+    az monitor action-group update `
+      --resource-group <resource-group> `
+      --name <action-group-name> `
+      --add-action email <action-name> <email-address>
+    ```
+
+    Replace `<resource-group>` with your resource group name, `<email-address>` with your email, and choose names for the group and action.
+
+1. Create a metric alert for total requests exceeding a threshold:
+
+    ```powershell
+    az monitor metrics alert create `
+      --resource-group <resource-group> `
+      --name "Token Usage Alert" `
+      --description "Alert when total requests exceed threshold" `
+      --scopes "/subscriptions/<subscription-id>/resourcegroups/<resource-group>/providers/microsoft.insights/components/<app-insights-name>" `
+      --condition "total requests > 30" `
+      --action <action-group-name> `
+      --window-size 5m `
+      --evaluation-frequency 1m
+    ```
+
+    Use values from your `.env` file for subscription ID, resource group, and Application Insights name.
+
+> **Note**: Use Azure CLI for alert creation to avoid UI binding issues that may occur in the portal when defining queries. CLI-based alerts are more reliable for automation and scripting.
 
 Alerts help you proactively catch unexpected spikes in usage before they translate into budget overruns.
 
