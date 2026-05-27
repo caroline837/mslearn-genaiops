@@ -331,7 +331,9 @@ The `check_traces.py` output gives you the full span tree for each version run â
 
 ## (OPTIONAL) Create an alert
 
-If you have extra time, set up an alert to notify you when token usage exceeds a threshold. Use Azure CLI to create the alert, which avoids potential UI binding issues in the Azure portal.
+If you have extra time, set up an alert to notify you when token usage exceeds a threshold.
+
+> **Use CLI only for this lab step**: Do not use the Azure portal alert-rule wizard for step-12. The portal query editor is embedded in an iframe and can fail to bind query text back to the parent form, resulting in `Query must be specified` on submit.
 
 1. In the VS Code terminal, create a new action group to receive notifications:
 
@@ -369,7 +371,15 @@ If you have extra time, set up an alert to notify you when token usage exceeds a
 
     Use values from your `.env` file for subscription ID, resource group, and Application Insights name.
 
-> **Note**: Use Azure CLI for alert creation to avoid UI binding issues that may occur in the portal when defining queries. CLI-based alerts are more reliable for automation and scripting.
+1. Verify the alert was created (step-12 completion check):
+
+    ```powershell
+    az monitor metrics alert show --resource-group <resource-group> --name "Token Usage Alert"
+    ```
+
+    If this command returns the alert definition JSON, consider step-12 completed.
+
+> **Note**: If you already tried the portal flow and got `Query must be specified`, skip the portal flow and rerun the CLI steps above.
 
 Alerts help you proactively catch unexpected spikes in usage before they translate into budget overruns.
 
